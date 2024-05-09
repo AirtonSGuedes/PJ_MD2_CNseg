@@ -1,0 +1,23 @@
+terminar a criação do bd
+
+responder ests perguntas 
+1. Selecionar a quantidade total de estudantes cadastrados no banco;
+2. Selecionar quais pessoas facilitadoras atuam em mais de uma turma;
+3. Crie uma view que selecione a porcentagem de estudantes com status de evasão
+agrupados por turma;
+4. Crie um trigger para ser disparado quando o atributo status de um estudante for atualizado
+e inserir um novo dado em uma tabela de log.
+5. Além disso, vocês deverão pensar em uma pergunta que deverá ser respondida por uma
+consulta SQL que combine pelo menos 3 tabelas.
+
+criar a pergunta que utilize 3 entidades no minimo
+
+fluxograma
+
+
+
+criar 6 tipos de consultas 
+
+
+criar os slides
+
