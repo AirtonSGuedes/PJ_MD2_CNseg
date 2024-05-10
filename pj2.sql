@@ -15,7 +15,9 @@ add constraint fk_Turma
 	foreign key (id_turma)
 	references "pj_md2"."Turmas"(id_turma);
 	
---  =======================
+-- 	
+--  ============================================================================================
+
 create table "pj_md2"."Alunos_Turma"(
 	ID_alunos_turma serial primary key,
 	ID_aluno int,
@@ -30,7 +32,8 @@ create table "pj_md2"."Alunos_Turma"(
         REFERENCES "pj_md2"."Alunos"(ID_aluno)
 );
 	
-	
+-- 	============================================================================================
+ 
 -- Este comando remove a tabela "pj_md2.Facilitadores" se ela existir.
 DROP TABLE IF EXISTS "pj_md2"."Facilitadores";
 
@@ -48,8 +51,87 @@ ALTER TABLE "pj_md2"."Facilitadores"
     ADD CONSTRAINT fk_módulo
     FOREIGN KEY (ID_módulo)
     REFERENCES "pj_md2"."Módulos"(ID_módulo);
+-- 	=================================================
+	create table "pj_md2"."Facilitadores_turma"(
+	Fac_turma serial primary key,
+	ID_turma INT,
+		ID_facilitador INT,
+    CONSTRAINT fk_turma
+        FOREIGN KEY (ID_turma)
+        REFERENCES "pj_md2"."Turmas"(ID_turma),
+		
+		CONSTRAINT fk_facilitador
+        FOREIGN KEY (ID_facilitador)
+        REFERENCES "pj_md2"."Facilitadores"(ID_facilitador)
+	);
 	
+	INSERT INTO "pj_md2"."Facilitadores_turma" (ID_turma,ID_facilitador)
+VALUES 
+(1, 4),
+(2,5),
+(3,6),(2,7),(1,8);
+	select * from "pj_md2"."Facilitadores_turma";
+-- 	=======================
+SELECT * FROM "pj_md2"."Turmas";
 
+SELECT 
+    F.Nome AS Nome_Facilitador,
+    T.nome_turma AS Nome_Turma
+FROM 
+    "pj_md2"."Facilitadores" F
+JOIN 
+    "pj_md2"."Facilitadores_turma" AS FT ON F.ID_facilitador = FT.ID_facilitador
+JOIN  
+    "pj_md2"."Turmas" AS T ON T.ID_turma = FT.ID_turma
+WHERE 
+    F.ID_facilitador IN (
+        SELECT 
+            ID_facilitador
+        FROM 
+            "pj_md2"."Facilitadores_turma"
+        GROUP BY 
+            ID_facilitador
+        HAVING 
+            COUNT(DISTINCT ID_turma) > 1
+    )
+GROUP BY 
+    F.ID_facilitador, F.Nome, T.nome_turma
+ORDER BY 
+    F.ID_facilitador;
+
+-- =====================================
+SELECT 
+    T2.nome_turma,
+
+	COUNT(FT.id_turma) as qtdturma
+
+FROM 
+    "pj_md2"."Facilitadores" F
+JOIN 
+    "pj_md2"."Facilitadores_turma" as FT 
+	ON F.ID_facilitador = FT.ID_facilitador
+	
+JOIN  "pj_md2"."Turmas" as T2
+ON T2.id_turma = FT.id_turma
+	
+GROUP BY 
+    T2.id_turma,T2.nome_turma
+HAVING 
+    COUNT(FT.id_turma) > 1;
+-- ==================
+	
+SELECT 
+    T.nome_turma,
+    F.Nome AS Nome_Facilitador,
+    F.CPF AS CPF_Facilitador,
+    F.Email AS Email_Facilitador
+FROM 
+    "pj_md2"."Facilitadores_turma" FT
+INNER JOIN 
+    "pj_md2"."Facilitadores" F ON FT.ID_facilitador = F.ID_facilitador
+INNER JOIN 
+    "pj_md2"."Turmas" T ON FT.ID_turma = T.ID_turma;
+-- ============================================
 -- Este comando remove a tabela "pj_md2.Turmas" se ela existir.
 DROP TABLE IF EXISTS "pj_md2"."Turmas";
 
@@ -72,9 +154,7 @@ CREATE TABLE "pj_md2"."Turmas" (
         FOREIGN KEY (ID_aluno)
         REFERENCES "pj_md2"."Alunos"(ID_aluno)
 );
-SELECT *
-FROM "pj_md2"."Turmas" as t
-left JOIN "pj_md2"."Alunos" ON t.id_aluno = "pj_md2"."Alunos".ID_aluno
+
 
 INNER JOIN tabela3 ON tabela2.coluna = tabela3.coluna
         
@@ -199,18 +279,62 @@ INSERT INTO "pj_md2"."Alunos" ("nome","cpf","data_de_nascimento","email","id_tur
     ('Thais Oliveira', '111.666.777-88', '1999-04-30', 'thais.oliveira@example.com', 1),
     ('Marcelo Pereira', '222.888.777-66', '1992-08-19', 'marcelo.pereira@example.com', 2),
     ('Jessica Costa', '333.888.999-00', '1991-05-28', 'jessica.costa@example.com', 3);
+	
+	
+-- ___ inserçaõ na tabela alunos_turma
+INSERT INTO "pj_md2"."Alunos_Turma" (ID_aluno, ID_turma)
+VALUES 
+(1, 1),(2,2),(3,3),
+(4,1),(5,2),
+(6,3),(7,1),(8,2),
+(9,3),(10,1),(11,2),
+(12,3),(13,1),(14,2),
+(15,3),(16,1),(17,2),
+(18,3),(19,1),(20,2),
+(21,3),(22,1),(23,2),
+(24,3),(25,1),(26,2),
+(27,3),(28,1),(29,2),
+(30,3),(31,1),(32,2),
+(33,3),(34,1),(35,2),
+(36,3),(37,1),(38,2),
+(39,3),(40,1),(41,2),
+(42,3),(43,1),(44,2),
+(45,3),(46,1),(47,2),
+(48,3),(49,1),(50,2),
+(51,3),(52,1),(53,2),
+(54,3),(55,1),(56,2),
+(57,3),(58,1),(59,2),
+(60,3),(61,1),(62,2),
+(63,3),(64,1),(65,2),
+(66,3),(67,1),(68,2),
+(69,3),(70,1),(71,2),
+(72,3),(73,1),(74,2),
+(75,3),(76,1),(77,2),
+(78,3),(79,1),(80,2),
+(81,3),(82,1),(83,2),
+(84,3),(85,1),(86,2),
+(87,3),(88,1),(89,2),
+(90,3),(91,1),(92,2),
+(93,3),(94,1),(95,2),
+(96,3);
+
+
 
 
 
 -- Inserções na tabela Facilitadores
-INSERT INTO "pj_md2"."Facilitadores" (nome, cpf, email)
+INSERT INTO "pj_md2"."Facilitadores" (Nome, CPF, Email, ID_módulo)
 VALUES 
-    ('João Silva', '123.456.789-00', 'joao@example.com'),
-    ('Maria Souza', '987.654.321-00', 'maria@example.com'),
-    ('Pedro Oliveira', '456.789.123-00', 'pedro@example.com'),
-    ('Ana Santos', '321.654.987-00', 'ana@example.com'),
-    ('Carlos Pereira', '654.321.987-00', 'carlos@example.com');
-	
+    ('Fernanda Oliveira', '123.456.789-00', 'fernanda@example.com', 1),
+    ('Rafaela Lima', '987.654.321-00', 'rafaela@example.com', 2),
+    ('Gabriel Pereira', '456.789.123-00', 'gabriel@example.com', 3);
+
+INSERT INTO "pj_md2"."Facilitadores" (Nome, CPF, Email, ID_módulo)
+VALUES 
+    ('Maria Souza', '987.654.321-00', 'maria@example.com', 2),
+    ('Pedro Santos', '456.789.123-00', 'pedro@example.com', 3);
+
+
 -- Inserções na tabela Turmas
 INSERT INTO "pj_md2"."Turmas" (nome_turma, data_inicio, data_fim)
 VALUES 
@@ -218,13 +342,25 @@ VALUES
     ('Turma B', '2024-05-15', '2024-07-15'),
     ('Turma C', '2024-06-01', '2024-08-01');
 
+update "pj_md2"."Turmas" set ID_curso = 1 where ID_turma = 1
+update "pj_md2"."Turmas" set ID_curso = 2 where ID_turma = 2
+update "pj_md2"."Turmas" set ID_curso = 3 where ID_turma = 3
+
+update "pj_md2"."Turmas" set ID_facilitador = 4 where ID_turma = 1
+update "pj_md2"."Turmas" set ID_facilitador = 5 where ID_turma = 2
+update "pj_md2"."Turmas" set ID_facilitador = 6 where ID_turma = 3
+update "pj_md2"."Turmas" set ID_facilitador = 7 where ID_turma = 2
+update "pj_md2"."Turmas" set ID_facilitador = 8 where ID_turma = 3
+
+
+
 -- Inserções na tabela Módulos
 
-INSERT INTO "pj_md2"."Módulos" (descrição, carga_horária)
+INSERT INTO "pj_md2"."Módulos" (Descrição, Carga_Horária, ID_turma)
 VALUES 
-    ('Módulo 1', 20),
-    ('Módulo 2', 25),
-    ('Módulo 3', 30);
+    ('Introdução à Programação', 40, 1),
+    ('Estruturas de Dados', 60, 2),
+    ('Algoritmos Avançados', 80, 3);
 -- Inserções na tabela Cursos
 
 INSERT INTO "pj_md2"."Cursos" (nome, descrição) VALUES
@@ -234,6 +370,8 @@ INSERT INTO "pj_md2"."Cursos" (nome, descrição) VALUES
 
 
 -- Exibir todos os registros da tabela Alunos
+-- 1. Selecionar a quantidade total de estudantes cadastrados no banco;
+
 SELECT * FROM "pj_md2"."Alunos";
 
 -- Exibir todos os registros da tabela Facilitadores
@@ -248,5 +386,21 @@ SELECT * FROM "pj_md2"."Módulos";
 -- Exibir todos os registros da tabela Cursos
 SELECT * FROM "pj_md2"."Cursos";
 
+-- ver quais alunos estão na turma desejada
+
+SELECT t.ID_turma, t.nome_turma, a.ID_aluno, a.Nome
+FROM "pj_md2"."Turmas" t
+JOIN "pj_md2"."Alunos_Turma" at ON t.ID_turma = at.ID_turma
+JOIN "pj_md2"."Alunos" a ON at.ID_aluno = a.ID_aluno
+WHERE t.ID_turma = 1; 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+SELECT t.ID_turma, t.nome_turma, a.ID_aluno, a.Nome
+FROM "pj_md2"."Turmas" t
+JOIN "pj_md2"."Alunos_Turma" at ON t.ID_turma = at.ID_turma
+JOIN "pj_md2"."Alunos" a ON at.ID_aluno = a.ID_aluno;
 
 select * from "pj_md2"."Alunos_Turma";
+
+
