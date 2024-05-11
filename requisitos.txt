@@ -33,3 +33,73 @@ criar 6 tipos de consultas
 criar os slides
 
 
+CREATE TABLE matricula 
+( 
+ matricula_id INT PRIMARY KEY,  
+ tipo INT,  
+ aluno_id INT,  
+ facilitador_id INT,  
+ turma_id INT,  
+ idfacilitadores INT,  
+ idturma INT,  
+ idalunos INT,  
+); 
+
+CREATE TABLE facilitadores 
+( 
+ facilitador_id INT PRIMARY KEY,  
+ nome INT,  
+ cpf INT,  
+ email INT,  
+); 
+
+CREATE TABLE turma 
+( 
+ turma_id INT PRIMARY KEY,  
+ nome INT,  
+ data_inicio INT,  
+ data_fim INT,  
+ cursos_id INT,  
+ idfacilitadores INT,  
+ idcursos INT,  
+); 
+
+CREATE TABLE alunos 
+( 
+ alunos_id INT PRIMARY KEY,  
+ nome INT,  
+ cpf INT,  
+ status INT,  
+ idlog INT,  
+); 
+
+CREATE TABLE log 
+( 
+ log_id INT PRIMARY KEY,  
+ aluno_id INT,  
+ dado_novo INT,  
+ dado_anterior INT,  
+); 
+
+CREATE TABLE cursos 
+( 
+ cursos_id INT PRIMARY KEY,  
+ nome INT,  
+ modulos_id INT,  
+ idmodulos INT,  
+); 
+
+CREATE TABLE modulos 
+( 
+ modulos_id INT PRIMARY KEY,  
+ nome INT,  
+ carga_horaria INT,  
+); 
+
+ALTER TABLE matricula ADD FOREIGN KEY(idfacilitadores) REFERENCES facilitadores (idfacilitadores)
+ALTER TABLE matricula ADD FOREIGN KEY(idturma) REFERENCES turma (idturma)
+ALTER TABLE matricula ADD FOREIGN KEY(idalunos) REFERENCES alunos (idalunos)
+ALTER TABLE turma ADD FOREIGN KEY(idfacilitadores) REFERENCES facilitadores (idfacilitadores)
+ALTER TABLE turma ADD FOREIGN KEY(idcursos) REFERENCES cursos (idcursos)
+ALTER TABLE alunos ADD FOREIGN KEY(idlog) REFERENCES log (idlog)
+ALTER TABLE cursos ADD FOREIGN KEY(idmodulos) REFERENCES modulos (idmodulos)
