@@ -103,3 +103,69 @@ ALTER TABLE turma ADD FOREIGN KEY(idfacilitadores) REFERENCES facilitadores (idf
 ALTER TABLE turma ADD FOREIGN KEY(idcursos) REFERENCES cursos (idcursos)
 ALTER TABLE alunos ADD FOREIGN KEY(idlog) REFERENCES log (idlog)
 ALTER TABLE cursos ADD FOREIGN KEY(idmodulos) REFERENCES modulos (idmodulos)
+
+-- Guilherme
+CREATE TABLE matricula  
+(  
+ matricula_id INT PRIMARY KEY,   
+ tipo INT NOT NULL,   
+ aluno_id INT NOT NULL,   
+ facilitador_id INT NOT NULL,   
+ turma_id INT NOT NULL,   
+ FOREIGN KEY (aluno_id) REFERENCES alunos (aluno_id),
+ FOREIGN KEY (facilitador_id) REFERENCES facilitadores (facilitador_id),
+ FOREIGN KEY (turma_id) REFERENCES turma (turma_id)
+);  
+
+CREATE TABLE facilitadores  
+(  
+ facilitador_id INT PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ cpf VARCHAR(20) NOT NULL,   
+ email VARCHAR(100) NOT NULL
+);  
+
+CREATE TABLE turma  
+(  
+ turma_id INT PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ data_inicio DATE NOT NULL,   
+ data_fim DATE NOT NULL,   
+ cursos_id INT NOT NULL,
+ facilitador_id INT NOT NULL,
+ FOREIGN KEY (cursos_id) REFERENCES cursos (cursos_id),
+ FOREIGN KEY (facilitador_id) REFERENCES facilitadores (facilitador_id)
+);  
+
+CREATE TABLE alunos  
+(  
+ aluno_id INT PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ cpf VARCHAR(20) NOT NULL,   
+ status INT NOT NULL,
+ idlog INT,
+ FOREIGN KEY (idlog) REFERENCES log (log_id)
+);  
+
+CREATE TABLE log  
+(  
+ log_id INT PRIMARY KEY,   
+ aluno_id INT NOT NULL,   
+ dado_novo INT NOT NULL,   
+ dado_anterior INT NOT NULL
+);  
+
+CREATE TABLE cursos  
+(  
+ cursos_id INT PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ modulos_id INT NOT NULL,
+ FOREIGN KEY (modulos_id) REFERENCES modulos (modulos_id)
+);  
+
+CREATE TABLE modulos  
+(  
+ modulos_id INT PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ carga_horaria INT NOT NULL
+);  
