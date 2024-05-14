@@ -445,7 +445,7 @@ AFTER UPDATE OF status ON "PJ_md2".alunos
 FOR EACH ROW
 EXECUTE FUNCTION "PJ_md2".log_status_update();
 
-s
+
 
 UPDATE "PJ_md2".alunos
 SET status = 0
