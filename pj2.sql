@@ -1,406 +1,479 @@
-DROP TABLE IF EXISTS "pj_md2"."Alunos";
 
--- Aqui, é criada uma nova tabela chamada "Alunos" no esquema "pj_md2". A tabela possui colunas para ID_aluno, Nome, CPF, Data_de_Nascimento e Email.
-CREATE TABLE "pj_md2"."Alunos" (
-    ID_aluno SERIAL PRIMARY KEY,
-    Nome VARCHAR(100),
-    CPF VARCHAR(14),
-    Data_de_Nascimento DATE,
-    Email VARCHAR(100)
-	
-);
-alter table "pj_md2"."Alunos"
-add column id_turma int,
-add constraint fk_Turma
-	foreign key (id_turma)
-	references "pj_md2"."Turmas"(id_turma);
-	
--- 	
---  ============================================================================================
+SELECT COUNT(f.nome) as turma,f.nome FROM "PJ_md2".matricula as mt
+INNER JOIN "PJ_md2".facilitadores as f
+ON f.facilitador_id = mt.facilitador_id
+GROUP BY f.nome
+HAVING COUNT(f.nome) >=2
 
-create table "pj_md2"."Alunos_Turma"(
-	ID_alunos_turma serial primary key,
-	ID_aluno int,
-	ID_turma int,
+
+-- Guilherme
+ select * from "PJ_md2".matricula  
+CREATE TABLE "PJ_md2".matricula  
+(  
+ matricula_id serial PRIMARY KEY,   
+ tipo varchar(15),   
+ aluno_id INT NOT NULL,   
+ facilitador_id INT NOT NULL,   
+ turma_id INT NOT NULL,   
+ FOREIGN KEY (aluno_id) REFERENCES "PJ_md2".alunos (aluno_id),
+ FOREIGN KEY (facilitador_id) REFERENCES "PJ_md2".facilitadores (facilitador_id),
+ FOREIGN KEY (turma_id) REFERENCES "PJ_md2".turma (turma_id)
+); 
+
+ALTER TABLE "PJ_md2".matricula 
+ADD COLUMN aluno_id int,
+ADD FOREIGN KEY (aluno_id) REFERENCES "PJ_md2".alunos (aluno_id),
+ADD COLUMN facilitador_id int,
+ADD FOREIGN KEY (facilitador_id) REFERENCES "PJ_md2".facilitadores (facilitador_id);
+
+CREATE TABLE "PJ_md2".facilitadores  
+(  
+ facilitador_id  SERIAL PRIMARY KEY ,   
+ nome VARCHAR(100) NOT NULL,   
+ cpf VARCHAR(20) NOT NULL,   
+ email VARCHAR(100) NOT NULL
+);  
+
+CREATE TABLE "PJ_md2".turma  
+(  
+ turma_id serial PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ data_inicio DATE NOT NULL,   
+ data_fim DATE NOT NULL,   
+ cursos_id INT NOT NULL,
+ FOREIGN KEY (cursos_id) REFERENCES "PJ_md2".cursos (cursos_id)
 	
-	constraint fk_Turma
-	foreign key (id_turma)
-	references "pj_md2"."Turmas"(id_turma),
-	
-	CONSTRAINT fk_aluno
-        FOREIGN KEY (ID_aluno)
-        REFERENCES "pj_md2"."Alunos"(ID_aluno)
-);
-	
--- 	============================================================================================
+); 
+CREATE TABLE "PJ_md2".alunos  
+(  
+ aluno_id serial PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ cpf VARCHAR(20) NOT NULL,   
+ status INT NOT NULL
+);  
+
+CREATE TABLE "PJ_md2".log  
+(  
+ log_id serial PRIMARY KEY,   
+ aluno_id INT NOT NULL,   
+ dado_novo INT NOT NULL,   
+ dado_anterior INT NOT NULL,
+ aluno INT,
+ FOREIGN KEY (aluno) REFERENCES "PJ_md2".alunos (aluno_id)
+);  
+ALTER TABLE "PJ_md2".log 
+DROP COLUMN aluno
+
+CREATE TABLE "PJ_md2".cursos  
+(  
+ cursos_id serial PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL
+);  
  
--- Este comando remove a tabela "pj_md2.Facilitadores" se ela existir.
-DROP TABLE IF EXISTS "pj_md2"."Facilitadores";
+CREATE TABLE "PJ_md2".modulos  
+(  
+ modulos_id serial  PRIMARY KEY,   
+ nome VARCHAR(100) NOT NULL,   
+ carga_horaria INT NOT NULL,
+ cursos_id INT,
+ FOREIGN KEY (cursos_id) REFERENCES "PJ_md2".cursos (cursos_id)
+);  
 
--- Aqui, é criada uma nova tabela chamada "Facilitadores" no esquema "pj_md2". A tabela possui colunas para ID_facilitador, Nome, CPF, Email e ID_módulo.
-CREATE TABLE "pj_md2"."Facilitadores" (
-    ID_facilitador SERIAL PRIMARY KEY,
-    Nome VARCHAR(100),
-    CPF VARCHAR(15),
-    Email VARCHAR(100)
-);
+-- ===================================INSERÇÃO DOS DADOS =================================
 
--- Este comando adiciona uma nova coluna chamada ID_módulo à tabela "Facilitadores". Também adiciona uma restrição de chave estrangeira (FOREIGN KEY) que referencia a tabela "Módulos".
-ALTER TABLE "pj_md2"."Facilitadores"
-    ADD COLUMN ID_módulo INT,
-    ADD CONSTRAINT fk_módulo
-    FOREIGN KEY (ID_módulo)
-    REFERENCES "pj_md2"."Módulos"(ID_módulo);
--- 	=================================================
-	create table "pj_md2"."Facilitadores_turma"(
-	Fac_turma serial primary key,
-	ID_turma INT,
-		ID_facilitador INT,
-    CONSTRAINT fk_turma
-        FOREIGN KEY (ID_turma)
-        REFERENCES "pj_md2"."Turmas"(ID_turma),
-		
-		CONSTRAINT fk_facilitador
-        FOREIGN KEY (ID_facilitador)
-        REFERENCES "pj_md2"."Facilitadores"(ID_facilitador)
-	);
-	
-	INSERT INTO "pj_md2"."Facilitadores_turma" (ID_turma,ID_facilitador)
+INSERT INTO "PJ_md2".facilitadores (nome, cpf, email) VALUES
+('Ana Silva', '123.456.789-00', 'ana.silva@example.com'),
+('Carlos Oliveira', '987.654.321-00', 'carlos.oliveira@example.com'),
+('Mariana Santos', '111.222.333-44', 'mariana.santos@example.com'),
+('Pedro Costa', '555.666.777-88', 'pedro.costa@example.com'),
+('Camila Souza', '999.888.777-66', 'camila.souza@example.com'),
+('João Pereira', '444.333.222-11', 'joao.pereira@example.com');
+
+-- =================================== Curso =================================
+
+INSERT INTO "PJ_md2".cursos (nome) VALUES
+('Curso de Programação'),
+('Curso de Design Gráfico'),
+('Curso de Marketing Digital');
+
+-- =================================== Modulos =================================
+
+INSERT INTO "PJ_md2".modulos (nome, carga_horaria, cursos_id) VALUES
+('Introdução à Programação', 20, 1),  -- Assumindo que os módulos para este curso começam no ID 1
+('Estruturas de Dados', 30, 1),
+('Algoritmos Avançados', 40, 1),
+('Introdução ao Design Gráfico', 25, 2), -- Assumindo que os módulos para este curso começam no ID 4
+('Ferramentas de Design', 35, 2),
+('Design de Interface', 30, 2),
+('Introdução ao Marketing Digital', 15, 3),
+('SEO e Marketing de Conteúdo', 25, 3),
+('Publicidade Online', 20, 3);
+
+-- ============================================ alunos =====================================
+-- Inserindo 100 alunos fictícios na tabela
+INSERT INTO "PJ_md2".alunos (nome, cpf, status)
+VALUES
+('João Silva', '123.456.789-10', 0),
+('Maria Santos', '987.654.321-00', 1),
+('Pedro Oliveira', '234.567.890-11', 0),
+('Ana Souza', '876.543.210-99', 1),
+('Lucas Pereira', '345.678.901-22', 1),
+('Mariana Costa', '765.432.109-88', 1),
+('Gabriel Martins', '456.789.012-33', 1),
+('Juliana Lima', '654.321.098-77', 1),
+('Rafael Almeida', '567.890.123-44', 1),
+('Camila Fernandes', '543.210.987-66', 1),
+('Diego Santos', '678.901.234-55', 1),
+('Carla Oliveira', '432.109.876-77', 1),
+('Fernando Pereira', '789.012.345-66', 0),
+('Amanda Costa', '321.098.765-88', 1),
+('Gustavo Martins', '890.123.456-77', 1),
+('Patrícia Lima', '210.987.654-99', 1),
+('Vinícius Almeida', '901.234.567-88', 1),
+('Beatriz Fernandes', '109.876.543-00', 1),
+('Roberto Santos', '012.345.678-11', 1),
+('Larissa Oliveira', '987.654.321-22', 1),
+('André Pereira', '345.678.901-33', 1),
+('Caroline Costa', '876.543.210-44', 1),
+('Henrique Martins', '456.789.012-55', 1),
+('Laura Lima', '654.321.098-66', 1),
+('Thiago Almeida', '567.890.123-77', 1),
+('Daniela Fernandes', '543.210.987-88', 1),
+('José Santos', '678.901.234-99', 1),
+('Isabela Oliveira', '432.109.876-00', 1),
+('Bruno Pereira', '789.012.345-11', 0),
+('Luana Costa', '321.098.765-22', 1),
+('Ricardo Martins', '890.123.456-33', 1),
+('Sara Lima', '210.987.654-44', 1),
+('Felipe Almeida', '901.234.567-55', 1),
+('Natália Fernandes', '109.876.543-66', 0),
+('Carlos Santos', '012.345.678-77', 1),
+('Lívia Oliveira', '987.654.321-88', 1),
+('Lucas Pereira', '345.678.901-99', 1),
+('Aline Costa', '876.543.210-00', 1),
+('Rodrigo Martins', '456.789.012-11', 0),
+('Renata Lima', '654.321.098-22', 1),
+('Paulo Almeida', '567.890.123-33', 1),
+('Tatiane Fernandes', '543.210.987-44', 1),
+('Marcelo Santos', '678.901.234-55', 1),
+('Mariana Oliveira', '432.109.876-66', 0),
+('Fábio Pereira', '789.012.345-77', 1),
+('Carolina Costa', '321.098.765-88', 1),
+('Vinícius Martins', '890.123.456-99', 1),
+('Fernanda Lima', '210.987.654-00', 1),
+('Rafael Almeida', '901.234.567-11', 1),
+('Amanda Fernandes', '109.876.543-22', 1),
+('Gustavo Santos', '012.345.678-33', 1),
+('Juliana Oliveira', '987.654.321-44', 1),
+('Ricardo Pereira', '345.678.901-55', 1),
+('Isabela Costa', '876.543.210-66', 1),
+('Bruno Martins', '456.789.012-77', 1),
+('Luana Lima', '654.321.098-88', 1),
+('Thiago Almeida', '567.890.123-99', 1),
+('Natália Fernandes', '543.210.987-00', 1),
+('Carlos Santos', '678.901.234-11', 1),
+('Lívia Oliveira', '432.109.876-22', 1),
+('Lucas Pereira', '789.012.345-33', 0),
+('Aline Costa', '321.098.765-44', 1),
+('Rodrigo Martins', '890.123.456-55', 1),
+('Renata Lima', '210.987.654-66', 1),
+('Paulo Almeida', '901.234.567-77', 1),
+('Tatiane Fernandes', '109.876.543-88', 1),
+('Marcelo Santos', '012.345.678-99', 1),
+('Mariana Oliveira', '987.654.321-00', 1),
+('Fábio Pereira', '345.678.901-11', 1),
+('Carolina Costa', '876.543.210-22', 1),
+('Vinícius Martins', '456.789.012-33', 1),
+('Fernanda Lima', '654.321.098-44', 1),
+('Rafael Almeida', '567.890.123-55', 0),
+('Amanda Fernandes', '543.210.987-66', 1),
+('Gustavo Santos', '678.901.234-77', 1),
+('Juliana Oliveira', '432.109.876-88', 0),
+('Ricardo Pereira', '789.012.345-99', 1),
+('Isabela Costa', '321.098.765-00', 1),
+('Bruno Martins', '901.234.567-11', 1),
+('Luana Lima', '109.876.543-22', 1),
+('Thiago Almeida', '012.345.678-33', 1),
+('Natália Fernandes', '987.654.321-44', 1),
+('Carlos Santos', '345.678.901-55', 1),
+('Lívia Oliveira', '567.890.123-66', 1),
+('Lucas Pereira', '654.321.098-77', 1),
+('Aline Costa', '890.123.456-88', 1),
+('Rodrigo Martins', '210.987.654-99', 1),
+('Renata Lima', '456.789.012-00', 1),
+('Paulo Almeida', '321.098.765-11', 1),
+('Tatiane Fernandes', '789.012.345-22', 1),
+('Marcelo Santos', '098.765.432-33', 1),
+('Mariana Oliveira', '234.567.890-44', 0),
+('Fábio Pereira', '543.210.987-55', 1),
+('Carolina Costa', '987.654.321-66', 1),
+('Vinícius Martins', '876.543.210-77', 1),
+('Fernanda Lima', '345.678.901-88', 1),
+('Rafael Almeida', '654.321.098-99', 1),
+('Amanda Fernandes', '901.234.567-00', 1),
+('Gustavo Santos', '210.987.654-11', 1),
+('Juliana Oliveira', '432.109.876-22', 1),
+('Ricardo Pereira', '789.012.345-33', 0),
+('Isabela Costa', '098.765.432-44', 1),
+('Bruno Martins', '345.678.901-55', 1),
+('Luana Lima', '654.321.098-66', 1),
+('Thiago Almeida', '901.234.567-77', 1),
+('Natália Fernandes', '210.987.654-88', 0),
+('Carlos Santos', '432.109.876-99', 0),
+('Lívia Oliveira', '789.012.345-00', 1),
+('Lucas Pereira', '987.654.321-11', 1),
+('Aline Costa', '210.987.654-22', 1),
+('Rodrigo Martins', '543.210.987-33', 1),
+('Renata Lima', '876.543.210-44', 1),
+('Paulo Almeida', '109.876.543-55', 1),
+('Tatiane Fernandes', '432.109.876-66', 0),
+('Marcelo Santos', '765.432.109-77', 1),
+('Mariana Oliveira', '098.765.432-88', 1),
+('Fábio Pereira', '321.098.765-99', 0);
+
+===================================== turmas ===================================== 
+
+INSERT INTO "PJ_md2".turma (nome, data_inicio, data_fim, cursos_id) 
 VALUES 
-(1, 4),
-(2,5),
-(3,6),(2,7),(1,8);
-	select * from "pj_md2"."Facilitadores_turma";
--- 	=======================
-SELECT * FROM "pj_md2"."Turmas";
-
-SELECT 
-    F.Nome AS Nome_Facilitador,
-    T.nome_turma AS Nome_Turma
-FROM 
-    "pj_md2"."Facilitadores" F
-JOIN 
-    "pj_md2"."Facilitadores_turma" AS FT ON F.ID_facilitador = FT.ID_facilitador
-JOIN  
-    "pj_md2"."Turmas" AS T ON T.ID_turma = FT.ID_turma
-WHERE 
-    F.ID_facilitador IN (
-        SELECT 
-            ID_facilitador
-        FROM 
-            "pj_md2"."Facilitadores_turma"
-        GROUP BY 
-            ID_facilitador
-        HAVING 
-            COUNT(DISTINCT ID_turma) > 1
-    )
-GROUP BY 
-    F.ID_facilitador, F.Nome, T.nome_turma
-ORDER BY 
-    F.ID_facilitador;
-
--- =====================================
-SELECT 
-    T2.nome_turma,
-
-	COUNT(FT.id_turma) as qtdturma
-
-FROM 
-    "pj_md2"."Facilitadores" F
-JOIN 
-    "pj_md2"."Facilitadores_turma" as FT 
-	ON F.ID_facilitador = FT.ID_facilitador
-	
-JOIN  "pj_md2"."Turmas" as T2
-ON T2.id_turma = FT.id_turma
-	
-GROUP BY 
-    T2.id_turma,T2.nome_turma
-HAVING 
-    COUNT(FT.id_turma) > 1;
--- ==================
-	
-SELECT 
-    T.nome_turma,
-    F.Nome AS Nome_Facilitador,
-    F.CPF AS CPF_Facilitador,
-    F.Email AS Email_Facilitador
-FROM 
-    "pj_md2"."Facilitadores_turma" FT
-INNER JOIN 
-    "pj_md2"."Facilitadores" F ON FT.ID_facilitador = F.ID_facilitador
-INNER JOIN 
-    "pj_md2"."Turmas" T ON FT.ID_turma = T.ID_turma;
--- ============================================
--- Este comando remove a tabela "pj_md2.Turmas" se ela existir.
-DROP TABLE IF EXISTS "pj_md2"."Turmas";
-
--- Aqui, é criada uma nova tabela chamada "Turmas" no esquema "pj_md2". A tabela possui colunas para ID_turma, nome_turma, data_inicio, data_fim, ID_curso, ID_facilitador e ID_aluno.
-CREATE TABLE "pj_md2"."Turmas" (
-    ID_turma SERIAL PRIMARY KEY,
-    nome_turma VARCHAR(100),
-    data_inicio DATE,
-    data_fim DATE,
-    ID_curso INT,
-    ID_facilitador INT,
-    ID_aluno INT,
-    CONSTRAINT fk_curso
-        FOREIGN KEY (ID_curso)
-        REFERENCES "pj_md2"."Cursos"(ID_curso),
-    CONSTRAINT fk_facilitador
-        FOREIGN KEY (ID_facilitador)
-        REFERENCES "pj_md2"."Facilitadores"(ID_facilitador),
-    CONSTRAINT fk_aluno
-        FOREIGN KEY (ID_aluno)
-        REFERENCES "pj_md2"."Alunos"(ID_aluno)
-);
+('Turma A', '2024-06-01', '2024-12-31', 1),
+('Turma B', '2024-07-15', '2024-12-15', 2),
+('Turma C', '2024-08-20', '2025-02-28', 3);
 
 
-INNER JOIN tabela3 ON tabela2.coluna = tabela3.coluna
-        
--- Este comando remove a tabela "pj_md2.Módulos" se ela existir.
-DROP TABLE IF EXISTS "pj_md2"."Módulos";
+-- ===================================================================================
+INSERT INTO "PJ_md2".matricula (tipo, aluno_id, turma_id)  VALUES 
+('alunos', 1, 1),
+('alunos', 2, 1),
+('alunos', 3, 1),
+('alunos', 4, 1),
+('alunos', 5, 1),
+('alunos', 6, 1),
+('alunos', 7, 1),
+('alunos', 8, 1),
+('alunos', 9, 1),
+('alunos', 10, 1),
+('alunos', 11, 1),
+('alunos', 12, 1),
+('alunos', 13, 1),
+('alunos', 14, 1),
+('alunos', 15, 1),
+('alunos', 16, 1),
+('alunos', 17, 1),
+('alunos', 18, 1),
+('alunos', 19, 1),
+('alunos', 20, 1),
+('alunos', 21, 1),
+('alunos', 22, 1),
+('alunos', 23, 1),
+('alunos', 24, 1),
+('alunos', 25, 1),
+('alunos', 26, 2),
+('alunos', 27, 2),
+('alunos', 28, 2),
+('alunos', 29, 2),
+('alunos', 30, 2),
+('alunos', 31, 2),
+('alunos', 32, 2),
+('alunos', 33, 2),
+('alunos', 34, 2),
+('alunos', 35, 2),
+('alunos', 36, 2),
+('alunos', 37, 2),
+('alunos', 38, 2),
+('alunos', 39, 2),
+('alunos', 40, 2),
+('alunos', 41, 2),
+('alunos', 42, 2),
+('alunos', 43, 2),
+('alunos', 44, 2),
+('alunos', 45, 2),
+('alunos', 46, 2),
+('alunos', 47, 2),
+('alunos', 48, 2),
+('alunos', 49, 2),
+('alunos', 50, 2),
+('alunos', 51, 2),
+('alunos', 52, 2),
+('alunos', 53, 2),
+('alunos', 54, 2),
+('alunos', 55, 2),
+('alunos', 56, 2),
+('alunos', 57, 2),
+('alunos', 58, 2),
+('alunos', 59, 2),
+('alunos', 60, 2),
+('alunos', 61, 2),
+('alunos', 62, 2),
+('alunos', 63, 2),
+('alunos', 64, 3),
+('alunos', 65, 3),
+('alunos', 66, 3),
+('alunos', 67, 3),
+('alunos', 68, 3),
+('alunos', 69, 3),
+('alunos', 70, 3),
+('alunos', 71, 3),
+('alunos', 72, 3),
+('alunos', 73, 3),
+('alunos', 74, 3),
+('alunos', 75, 3),
+('alunos', 76, 3),
+('alunos', 77, 3),
+('alunos', 78, 3),
+('alunos', 79, 3),
+('alunos', 80, 3),
+('alunos', 81, 3),
+('alunos', 82, 3),
+('alunos', 83, 3),
+('alunos', 84, 3),
+('alunos', 85, 3),
+('alunos', 86, 3),
+('alunos', 87, 3),
+('alunos', 88, 3),
+('alunos', 89, 3),
+('alunos', 90, 3),
+('alunos', 91, 3),
+('alunos', 92, 3),
+('alunos', 93, 3),
+('alunos', 94, 3),
+('alunos', 95, 3),
+('alunos', 96, 3),
+('alunos', 97, 3),
+('alunos', 98, 3),
+('alunos', 99, 3),
+('alunos', 100, 3),
+('alunos', 101, 1),
+('alunos', 102, 1),
+('alunos', 103, 1),
+('alunos', 104, 1),
+('alunos', 105, 1),
+('alunos', 106, 1),
+('alunos', 107, 1),
+('alunos', 108, 1),
+('alunos', 109, 1),
+('alunos', 110, 1),
+('alunos', 111, 1),
+('alunos', 112, 1),
+('alunos', 113, 1),
+('alunos', 114, 2),
+('alunos', 115, 2),
+('alunos', 116, 2),
+('alunos', 117, 2);
 
--- Aqui, é criada uma nova tabela chamada "Módulos" no esquema "pj_md2". A tabela possui colunas para ID_módulo, Descrição, Carga_Horária e ID_turma.
-CREATE TABLE "pj_md2"."Módulos" (
-    ID_Módulo SERIAL PRIMARY KEY,
-    Descrição VARCHAR(255),
-    Carga_Horária INT,
-    ID_turma INT,
-    CONSTRAINT fk_turma
-        FOREIGN KEY (ID_turma)
-        REFERENCES "pj_md2"."Turmas"(ID_turma)
-);
 
--- Este comando remove a tabela "pj_md2.Cursos" se ela existir.
-DROP TABLE IF EXISTS "pj_md2"."Cursos";
+INSERT INTO "PJ_md2".matricula  (tipo, facilitador_id, turma_id) VALUES
 
--- Aqui, é criada uma nova tabela chamada "Cursos" no esquema "pj_md2". A tabela possui colunas para ID_curso, Nome e Descrição.
-CREATE TABLE "pj_md2"."Cursos" (
-    ID_curso SERIAL PRIMARY KEY,
-    Nome VARCHAR(100),
-    Descrição TEXT
-);
--- Inserção de dados na tabela Alunos
-INSERT INTO "pj_md2"."Alunos" ("nome","cpf","data_de_nascimento","email","id_turma") VALUES
-    ('Renan Silva', '111.456.789-01', '1990-01-01', 'renan.silva@example.com', 1),
-    ('Amanda Souza', '222.654.321-09', '1992-05-15', 'amanda.souza@example.com', 2),
-    ('Fábio Santos', '333.222.333-44', '1988-10-20', 'fabio.santos@example.com', 3),
-    ('Laura Oliveira', '444.666.777-88', '1995-03-30', 'laura.oliveira@example.com', 1),
-    ('Marcela Pereira', '555.888.777-66', '1998-12-25', 'marcela.pereira@example.com', 2),
-    ('Rafael Costa', '666.888.999-00', '1994-07-12', 'rafael.costa@example.com', 3),
-    ('Juliano Santos', '777.456.789-01', '1993-02-28', 'juliano.santos@example.com', 1),
-    ('Elaine Oliveira', '888.654.321-09', '1991-09-05', 'elaine.oliveira@example.com', 2),
-    ('Raphael Souza', '999.222.333-44', '1997-06-08', 'raphael.souza@example.com', 3),
-    ('Camila Silva', '111.666.777-88', '1996-11-17', 'camila.silva@example.com', 1),
-    ('Lucas Pereira', '222.888.777-66', '1999-04-22', 'lucas.pereira@example.com', 2),
-    ('Patrícia Costa', '333.888.999-00', '1990-08-07', 'patricia.costa@example.com', 3),
-    ('Felipe Oliveira', '444.456.789-01', '1992-01-09', 'felipe.oliveira@example.com', 1),
-    ('Sandra Santos', '555.654.321-09', '1989-03-18', 'sandra.santos@example.com', 2),
-    ('Carlos Souza', '666.222.333-44', '1994-05-25', 'carlos.souza@example.com', 3),
-    ('Nathália Oliveira', '777.666.777-88', '1993-10-14', 'nathalia.oliveira@example.com', 1),
-    ('Roberto Pereira', '888.888.777-66', '1998-11-03', 'roberto.pereira@example.com', 2),
-    ('Carolina Costa', '999.888.999-00', '1991-07-26', 'carolina.costa@example.com', 3),
-    ('Rogério Silva', '111.456.789-01', '1995-04-03', 'rogerio.silva@example.com', 1),
-    ('Fernanda Souza', '222.654.321-09', '1996-09-19', 'fernanda.souza@example.com', 2),
-    ('Bruno Santos', '333.222.333-44', '1990-12-28', 'bruno.santos@example.com', 3),
-    ('Tatiana Oliveira', '444.666.777-88', '1992-03-07', 'tatiana.oliveira@example.com', 1),
-    ('Ricardo Pereira', '555.888.777-66', '1994-08-16', 'ricardo.pereira@example.com', 2),
-    ('Vanessa Costa', '666.888.999-00', '1999-01-31', 'vanessa.costa@example.com', 3),
-    ('Fernando Silva', '777.456.789-01', '1997-06-02', 'fernando.silva@example.com', 1),
-    ('Gabriela Souza', '888.654.321-09', '1998-10-21', 'gabriela.souza@example.com', 2),
-    ('Paula Santos', '999.222.333-44', '1993-02-14', 'paula.santos@example.com', 3),
-    ('Leandro Oliveira', '111.666.777-88', '1991-11-23', 'leandro.oliveira@example.com', 1),
-    ('Sergio Pereira', '222.888.777-66', '1996-04-08', 'sergio.pereira@example.com', 2),
-    ('Ana Costa', '333.888.999-00', '1995-07-17', 'ana.costa@example.com', 3),
-    ('Alexandre Silva', '444.456.789-01', '1992-09-04', 'alexandre.silva@example.com', 1),
-    ('Mariana Souza', '555.654.321-09', '1990-05-13', 'mariana.souza@example.com', 2),
-    ('Juliano Santos', '666.222.333-44', '1994-11-20', 'juliano.santos@example.com', 3),
-    ('Roberta Oliveira', '777.666.777-88', '1997-01-29', 'roberta.oliveira@example.com', 1),
-    ('André Pereira', '888.888.777-66', '1999-03-18', 'andre.pereira@example.com', 2),
-    ('Carla Costa', '999.888.999-00', '1996-08-07', 'carla.costa@example.com', 3),
-    ('Rafaela Silva', '111.456.789-01', '1993-12-14', 'rafaela.silva@example.com', 1),
-    ('José Souza', '222.654.321-09', '1991-04-23', 'jose.souza@example.com', 2),
-    ('Diego Santos', '333.222.333-44', '1998-10-30', 'diego.santos@example.com', 3),
-    ('Cristina Oliveira', '444.666.777-88', '1995-02-08', 'cristina.oliveira@example.com', 1),
-    ('Ana Pereira', '555.888.777-66', '1990-07-17', 'ana.pereira@example.com', 2),
-    ('Rodrigo Costa', '666.888.999-00', '1994-11-24', 'rodrigo.costa@example.com', 3),
-    ('Lucas Silva', '777.456.789-01', '1997-01-05', 'lucas.silva@example.com', 1),
-    ('Larissa Souza', '888.654.321-09', '1996-03-14', 'larissa.souza@example.com', 2),
-    ('Gustavo Santos', '999.222.333-44', '1993-09-25', 'gustavo.santos@example.com', 3),
-    ('Caroline Oliveira', '111.666.777-88', '1999-04-30', 'caroline.oliveira@example.com', 1),
-    ('Marcos Pereira', '222.888.777-66', '1992-08-19', 'marcos.pereira@example.com', 2),
-    ('Lucas Costa', '333.888.999-00', '1991-05-28', 'lucas.costa@example.com', 3),
-	('João Silva', '111.456.789-01', '1990-01-01', 'joao.silva@example.com', 1),
-    ('Maria Souza', '222.654.321-09', '1992-05-15', 'maria.souza@example.com', 2),
-    ('Pedro Santos', '333.222.333-44', '1988-10-20', 'pedro.santos@example.com', 3),
-    ('Ana Oliveira', '444.666.777-88', '1995-03-30', 'ana.oliveira@example.com', 1),
-    ('Lucas Pereira', '555.888.777-66', '1998-12-25', 'lucas.pereira@example.com', 2),
-    ('Juliana Costa', '666.888.999-00', '1994-07-12', 'juliana.costa@example.com', 3),
-    ('Marcos Santos', '777.456.789-01', '1993-02-28', 'marcos.santos@example.com', 1),
-    ('Fernanda Oliveira', '888.654.321-09', '1991-09-05', 'fernanda.oliveira@example.com', 2),
-    ('Gabriel Souza', '999.222.333-44', '1997-06-08', 'gabriel.souza@example.com', 3),
-    ('Carla Silva', '111.666.777-88', '1996-11-17', 'carla.silva@example.com', 1),
-    ('Rafaela Pereira', '222.888.777-66', '1999-04-22', 'rafaela.pereira@example.com', 2),
-    ('Mateus Oliveira', '333.888.999-00', '1990-08-07', 'mateus.oliveira@example.com', 3),
-    ('André Costa', '444.456.789-01', '1992-01-09', 'andre.costa@example.com', 1),
-    ('Luana Santos', '555.654.321-09', '1989-03-18', 'luana.santos@example.com', 2),
-    ('Gustavo Souza', '666.222.333-44', '1994-05-25', 'gustavo.souza@example.com', 3),
-    ('Aline Oliveira', '777.666.777-88', '1993-10-14', 'aline.oliveira@example.com', 1),
-    ('Bruno Pereira', '888.888.777-66', '1998-11-03', 'bruno.pereira@example.com', 2),
-    ('Mariana Costa', '999.888.999-00', '1991-07-26', 'mariana.costa@example.com', 3),
-    ('Leonardo Silva', '111.456.789-01', '1995-04-03', 'leonardo.silva@example.com', 1),
-    ('Camila Souza', '222.654.321-09', '1996-09-19', 'camila.souza@example.com', 2),
-    ('Thiago Santos', '333.222.333-44', '1990-12-28', 'thiago.santos@example.com', 3),
-    ('Bianca Oliveira', '444.666.777-88', '1992-03-07', 'bianca.oliveira@example.com', 1),
-    ('Luisa Pereira', '555.888.777-66', '1994-08-16', 'luisa.pereira@example.com', 2),
-    ('Vinicius Costa', '666.888.999-00', '1999-01-31', 'vinicius.costa@example.com', 3),
-    ('Rodrigo Silva', '777.456.789-01', '1997-06-02', 'rodrigo.silva@example.com', 1),
-    ('Nathalia Souza', '888.654.321-09', '1998-10-21', 'nathalia.souza@example.com', 2),
-    ('Paulo Santos', '999.222.333-44', '1993-02-14', 'paulo.santos@example.com', 3),
-    ('Isabela Oliveira', '111.666.777-88', '1991-11-23', 'isabela.oliveira@example.com', 1),
-    ('Ricardo Pereira', '222.888.777-66', '1996-04-08', 'ricardo.pereira@example.com', 2),
-    ('Letícia Costa', '333.888.999-00', '1995-07-17', 'leticia.costa@example.com', 3),
-    ('Vanessa Silva', '444.456.789-01', '1992-09-04', 'vanessa.silva@example.com', 1),
-    ('Fábio Souza', '555.654.321-09', '1990-05-13', 'fabio.souza@example.com', 2),
-    ('Laura Santos', '666.222.333-44', '1994-11-20', 'laura.santos@example.com', 3),
-    ('Miguel Oliveira', '777.666.777-88', '1997-01-29', 'miguel.oliveira@example.com', 1),
-    ('Tatiane Pereira', '888.888.777-66', '1999-03-18', 'tatiane.pereira@example.com', 2),
-    ('Luciana Costa', '999.888.999-00', '1996-08-07', 'luciana.costa@example.com', 3),
-    ('Diego Silva', '111.456.789-01', '1993-12-14', 'diego.silva@example.com', 1),
-    ('Carolina Souza', '222.654.321-09', '1991-04-23', 'carolina.souza@example.com', 2),
-    ('Daniel Santos', '333.222.333-44', '1998-10-30', 'daniel.santos@example.com', 3),
-    ('Fernando Oliveira', '444.666.777-88', '1995-02-08', 'fernando.oliveira@example.com', 1),
-    ('Julia Pereira', '555.888.777-66', '1990-07-17', 'julia.pereira@example.com', 2),
-    ('Guilherme Costa', '666.888.999-00', '1994-11-24', 'guilherme.costa@example.com', 3),
-    ('Patricia Silva', '777.456.789-01', '1997-01-05', 'patricia.silva@example.com', 1),
-    ('Roberto Souza', '888.654.321-09', '1996-03-14', 'roberto.souza@example.com', 2),
-    ('Viviane Santos', '999.222.333-44', '1993-09-25', 'viviane.santos@example.com', 3),
-    ('Thais Oliveira', '111.666.777-88', '1999-04-30', 'thais.oliveira@example.com', 1),
-    ('Marcelo Pereira', '222.888.777-66', '1992-08-19', 'marcelo.pereira@example.com', 2),
-    ('Jessica Costa', '333.888.999-00', '1991-05-28', 'jessica.costa@example.com', 3);
-	
-	
--- ___ inserçaõ na tabela alunos_turma
-INSERT INTO "pj_md2"."Alunos_Turma" (ID_aluno, ID_turma)
-VALUES 
-(1, 1),(2,2),(3,3),
-(4,1),(5,2),
-(6,3),(7,1),(8,2),
-(9,3),(10,1),(11,2),
-(12,3),(13,1),(14,2),
-(15,3),(16,1),(17,2),
-(18,3),(19,1),(20,2),
-(21,3),(22,1),(23,2),
-(24,3),(25,1),(26,2),
-(27,3),(28,1),(29,2),
-(30,3),(31,1),(32,2),
-(33,3),(34,1),(35,2),
-(36,3),(37,1),(38,2),
-(39,3),(40,1),(41,2),
-(42,3),(43,1),(44,2),
-(45,3),(46,1),(47,2),
-(48,3),(49,1),(50,2),
-(51,3),(52,1),(53,2),
-(54,3),(55,1),(56,2),
-(57,3),(58,1),(59,2),
-(60,3),(61,1),(62,2),
-(63,3),(64,1),(65,2),
-(66,3),(67,1),(68,2),
-(69,3),(70,1),(71,2),
-(72,3),(73,1),(74,2),
-(75,3),(76,1),(77,2),
-(78,3),(79,1),(80,2),
-(81,3),(82,1),(83,2),
-(84,3),(85,1),(86,2),
-(87,3),(88,1),(89,2),
-(90,3),(91,1),(92,2),
-(93,3),(94,1),(95,2),
-(96,3);
+('facilitador',1,1),
+('facilitador',2,1),
+('facilitador',3,1),
+('facilitador',4,2),
+('facilitador',5,2),
+('facilitador',6,3);
+
+1. Selecionar a quantidade total de estudantes cadastrados no banco; feito
+
+select * from "PJ_md2".alunos
+
+2. Selecionar quais pessoas facilitadoras atuam em mais de uma turma;
+
+
+
+SELECT COUNT(f.nome) as turma,f.nome FROM "PJ_md2".matricula as mt
+INNER JOIN "PJ_md2".facilitadores as f
+ON f.facilitador_id = mt.facilitador_id
+GROUP BY f.nome
+HAVING COUNT(f.nome) >=2
+
+
+
+3. Crie uma view que selecione a porcentagem de estudantes com status de evasão
+agrupados por turma;
+
+
+
+4. Crie um trigger para ser disparado quando o atributo status de um estudante for atualizado
+e inserir um novo dado em uma tabela de log.
 
 
 
 
 
--- Inserções na tabela Facilitadores
-INSERT INTO "pj_md2"."Facilitadores" (Nome, CPF, Email, ID_módulo)
-VALUES 
-    ('Fernanda Oliveira', '123.456.789-00', 'fernanda@example.com', 1),
-    ('Rafaela Lima', '987.654.321-00', 'rafaela@example.com', 2),
-    ('Gabriel Pereira', '456.789.123-00', 'gabriel@example.com', 3);
+5. Além disso, vocês deverão pensar em uma pergunta que deverá ser respondida por uma
+consulta SQL que combine pelo menos 3 tabelas.
 
-INSERT INTO "pj_md2"."Facilitadores" (Nome, CPF, Email, ID_módulo)
-VALUES 
-    ('Maria Souza', '987.654.321-00', 'maria@example.com', 2),
-    ('Pedro Santos', '456.789.123-00', 'pedro@example.com', 3);
+select * from "PJ_md2".matricula
 
+-- ============= view ================
 
--- Inserções na tabela Turmas
-INSERT INTO "pj_md2"."Turmas" (nome_turma, data_inicio, data_fim)
-VALUES 
-    ('Turma A', '2024-05-01', '2024-06-01'),
-    ('Turma B', '2024-05-15', '2024-07-15'),
-    ('Turma C', '2024-06-01', '2024-08-01');
+-- 3. Crie uma view que selecione a porcentagem de estudantes com status de evasão
+-- agrupados por turma;
+-- Este código cria ou substitui uma view chamada "evasao_por_turma" no banco de dados "PJ_md2",
+-- que contém informações sobre evasão por turma.
 
-update "pj_md2"."Turmas" set ID_curso = 1 where ID_turma = 1
-update "pj_md2"."Turmas" set ID_curso = 2 where ID_turma = 2
-update "pj_md2"."Turmas" set ID_curso = 3 where ID_turma = 3
+CREATE OR REPLACE VIEW "PJ_md2".evasao_por_turma AS
+-- Cria ou substitui a view "evasao_por_turma" no esquema "PJ_md2".
+SELECT
+    t.turma_id, -- Seleciona o ID da turma.
+    t.nome AS nome_turma, -- Seleciona o nome da turma, renomeando a coluna como 'nome_turma'.
+    COUNT(*) AS total_alunos, -- Conta o número total de registros encontrados na consulta, representando o total de alunos na turma.
+    SUM(CASE WHEN a.status = 0 THEN 1 ELSE 0 END) AS evadidos, -- Calcula o número de alunos evadidos na turma (com status igual a 0).
+    ROUND((SUM(CASE WHEN a.status = 0 THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) AS porcentagem_evasao
+    -- Calcula a porcentagem de evasão na turma, arredondando para 2 casas decimais.
+FROM
+    "PJ_md2".turma t -- Seleciona dados da tabela "turma" (alias 't').
+INNER JOIN
+    "PJ_md2".matricula m ON t.turma_id = m.turma_id -- Realiza uma junção interna com a tabela "matricula" (alias 'm') usando o ID da turma.
+INNER JOIN
+    "PJ_md2".alunos a ON m.aluno_id = a.aluno_id -- Realiza uma junção interna com a tabela "alunos" (alias 'a') usando o ID do aluno.
+GROUP BY
+    t.turma_id, t.nome; -- Agrupa os resultados pela turma_id e pelo nome da turma.
 
-update "pj_md2"."Turmas" set ID_facilitador = 4 where ID_turma = 1
-update "pj_md2"."Turmas" set ID_facilitador = 5 where ID_turma = 2
-update "pj_md2"."Turmas" set ID_facilitador = 6 where ID_turma = 3
-update "pj_md2"."Turmas" set ID_facilitador = 7 where ID_turma = 2
-update "pj_md2"."Turmas" set ID_facilitador = 8 where ID_turma = 3
+-- ===========================================
 
+CREATE OR REPLACE FUNCTION "PJ_md2".log_status_update()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO "PJ_md2".log (aluno_id, dado_novo, dado_anterior)
+    VALUES (NEW.aluno_id, NEW.status, OLD.status);
 
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
--- Inserções na tabela Módulos
-
-INSERT INTO "pj_md2"."Módulos" (Descrição, Carga_Horária, ID_turma)
-VALUES 
-    ('Introdução à Programação', 40, 1),
-    ('Estruturas de Dados', 60, 2),
-    ('Algoritmos Avançados', 80, 3);
--- Inserções na tabela Cursos
-
-INSERT INTO "pj_md2"."Cursos" (nome, descrição) VALUES
-('Matemática Básica', 'Curso introdutório sobre conceitos fundamentais de matemática.'),
-('Programação em Python', 'Curso abrangente sobre programação utilizando a linguagem Python.'),
-('Ciência de Dados', 'Curso avançado sobre técnicas e ferramentas para análise de dados.');
-
-
--- Exibir todos os registros da tabela Alunos
--- 1. Selecionar a quantidade total de estudantes cadastrados no banco;
-
-SELECT * FROM "pj_md2"."Alunos";
-
--- Exibir todos os registros da tabela Facilitadores
-SELECT * FROM "pj_md2"."Facilitadores";
-
--- Exibir todos os registros da tabela Turmas
-SELECT * FROM "pj_md2"."Turmas";
-
--- Exibir todos os registros da tabela Módulos
-SELECT * FROM "pj_md2"."Módulos";
-
--- Exibir todos os registros da tabela Cursos
-SELECT * FROM "pj_md2"."Cursos";
-
--- ver quais alunos estão na turma desejada
-
-SELECT t.ID_turma, t.nome_turma, a.ID_aluno, a.Nome
-FROM "pj_md2"."Turmas" t
-JOIN "pj_md2"."Alunos_Turma" at ON t.ID_turma = at.ID_turma
-JOIN "pj_md2"."Alunos" a ON at.ID_aluno = a.ID_aluno
-WHERE t.ID_turma = 1; 
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CREATE TRIGGER status_update_trigger
+AFTER UPDATE OF status ON "PJ_md2".alunos
+FOR EACH ROW
+EXECUTE FUNCTION "PJ_md2".log_status_update();
 
 
-SELECT t.ID_turma, t.nome_turma, a.ID_aluno, a.Nome
-FROM "pj_md2"."Turmas" t
-JOIN "pj_md2"."Alunos_Turma" at ON t.ID_turma = at.ID_turma
-JOIN "pj_md2"."Alunos" a ON at.ID_aluno = a.ID_aluno;
 
-select * from "pj_md2"."Alunos_Turma";
+UPDATE "PJ_md2".alunos
+SET status = 0
+WHERE aluno_id = 15
+
+select * from "PJ_md2".log
+
+SELECT * FROM "PJ_md2".evasao_por_turma
 
 
+
+
+SELECT facilitador_id, COUNT(DISTINCT turma_id) AS num_turmas
+FROM "PJ_md2".matricula
+WHERE tipo = 'facilitador'
+GROUP BY facilitador_id
+HAVING COUNT(DISTINCT turma_id) > 1;
+
+
+--SELECT 
+--   m.matricula_id,
+--   f.facilitador_id,
+--   f.nome as nome_facilitador,
+--   a.aluno_id,
+--   a.nome as nome_aluno
+-- FROM 
+--   "PJ_md2".matricula m
+-- INNER JOIN 
+--   "PJ_md2".facilitadores f ON m.facilitador_id = f.facilitador_id
+-- INNER JOIN 
+--  "PJ_md2".alunos a ON m.aluno_id = a.aluno_id;
