@@ -54,7 +54,7 @@ Os scripts SQL fornecidos incluem:
 
 ## Exemplo de Diagrama de Banco de Dados
 
-![Diagrama de Banco de Dados](link_para_sua_imagem)
+![Diagrama de Banco de Dados](https://github.com/AirtonSGuedes/PJ_MD2_CNseg/blob/main/pjg_md2/image.jpg?raw=true)
 
 ## Exemplo de Insert SQL
  ```sql
