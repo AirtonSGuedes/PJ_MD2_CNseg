@@ -56,7 +56,7 @@ Os scripts SQL fornecidos incluem:
 
 ![Diagrama de Banco de Dados](link_para_sua_imagem)
 
-## Exemplo de Insert e Consulta SQL
+## Exemplo de Insert SQL
  ```sql
 INSERT INTO "PJ_md2".facilitadores (nome, cpf, email) VALUES
 ('Ana Silva', '123.456.789-00', 'ana.silva@example.com'),
