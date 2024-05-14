@@ -1,13 +1,11 @@
 
-SELECT COUNT(f.nome) as turma,f.nome FROM "PJ_md2".matricula as mt
-INNER JOIN "PJ_md2".facilitadores as f
-ON f.facilitador_id = mt.facilitador_id
-GROUP BY f.nome
-HAVING COUNT(f.nome) >=2
+--SELECT COUNT(f.nome) as turma,f.nome FROM "PJ_md2".matricula as mt
+--INNER JOIN "PJ_md2".facilitadores as f
+--ON f.facilitador_id = mt.facilitador_id
+--GROUP BY f.nome
+--HAVING COUNT(f.nome) >=2
 
-
--- Guilherme
- select * from "PJ_md2".matricula  
+Select * from "PJ_md2".matricula  
 CREATE TABLE "PJ_md2".matricula  
 (  
  matricula_id serial PRIMARY KEY,   
